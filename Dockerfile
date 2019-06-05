@@ -8,6 +8,6 @@ ENV PATH="/flappie:${PATH}"
 
 # Install ont-fast-api
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && apt install git-lfs && git clone https://github.com/nanoporetech/flappie --branch v1.1.0 && cd flappie && git lfs install && make flappie
-RUN conda install -c bioconda -c conda-forge ont-fast5-api==1.2.0--py_0
+RUN conda install -c bioconda -c conda-forge ont-fast5-api=1.4.0
 
 SHELL ["/bin/bash", "-ce"]
