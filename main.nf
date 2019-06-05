@@ -1,19 +1,41 @@
 #!/usr/bin/env/ nextflow
-fast5folder = params.input
-id = "testID"
+fast5folders_ch = Channel.from([['test1', '/mnt/SRV018/projects/external/promethion/basecall_test/']])
 
-process basecall_flappie {
-// Use flappie to do flip-flop basecalling on files
+params.nreads = 10000
+
+process convert_fast5 {
+// Flappie is not able to use current multi-read Fast5 files. Use ont-fast5-api to convert single to multi fast5
 
     input:
-    set id, fast5folder 
+    set id, folder from fast5folders_ch
 
     output:
-    set id,  assembly, file('reads_filtered.fastq') into samples_filtered
+    set id, file('**/*.fast5') into multi_fast5_ch
 
     script:
     """
-    flappie ${fast5folder} > basecalled.fastq
-    """"
+    multi_to_single_fast5 -i ${folder} -s \$(pwd) -t ${task.cpus} --recursive
+    """
+}
+
+multi_fast5_ch
+	.map{it[1]}
+	.view()
+	.set{multi_fast5_separate_ch}
+
+process basecall_flappie {
+// Use flappie to do flip-flop basecalling on files
+    publishDir "${params.outDir}/flipflop/", mode:'copy'	
+   
+    input:
+    set id, fast5 from multi_fast5_separate_ch
+
+    output:
+    file("${id}_flipflop.fastq")
+
+    script:
+    """
+    echo ${fast5} | tr -d [], | parallel -p ${task.cpus} -X flappie > ${id}_flipflop.fastq
+    """
 }
 
