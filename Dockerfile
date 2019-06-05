@@ -7,7 +7,7 @@ RUN apt update && apt install -y git libcunit1 libhdf5-100 libopenblas-base cmak
 ENV PATH="/flappie:${PATH}"
 
 # Install ont-fast-api
-RUN git clone https://github.com/nanoporetech/flappie --branch v1.1.0 && cd flappie && git lfs install && make flappie
+RUN git clone https://github.com/nanoporetech/flappie --branch v1.1.0 && cd flappie && make flappie
 RUN conda install -c bioconda -c conda-forge ont-fast5-api==1.3.0--py_0
 
 SHELL ["/bin/bash", "-ce"]
