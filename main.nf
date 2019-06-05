@@ -3,7 +3,7 @@ fast5folders_ch = Channel.from([['test1', '/mnt/SRV018/projects/external/prometh
 
 params.nreads = 10000
 
-process convert_fast5 {
+process basecall_flappie {
 // Flappie is not able to use current multi-read Fast5 files. Use ont-fast5-api to convert single to multi fast5
 
     input:
@@ -15,6 +15,7 @@ process convert_fast5 {
     script:
     """
     multi_to_single_fast5 -i ${folder} -s \$(pwd) -t ${task.cpus} --recursive
+    ls -d */ | parallel -p ${task.cpus} -X flappie > ${id}_flipflop.fastq
     """
 }
 
